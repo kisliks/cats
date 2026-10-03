@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halal — Каталог пород котиков и интерактивный подбор</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#090d16',
+                        cardBg: '#131b2e',
+                        cardBorder: '#1e293b',
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #090d16;
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(19, 27, 46, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .glass-modal {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-[#090d16] text-slate-100 min-h-screen flex flex-col selection:bg-rose-500 selection:text-white">
+
+    <header class="sticky top-0 z-40 glass border-b border-slate-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-500 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20">
+                    <i data-lucide="cat" class="w-7 h-7"></i>
+                </div>
+                <div>
+                    <span class="text-2xl font-extrabold tracking-tight text-white">Halal</span>
+                    <p class="text-xs text-slate-400 font-medium">Твой пушистый путеводитель</p>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex items-center space-x-8 font-medium text-slate-300">
+                <a href="#explorer" class="hover:text-rose-400 transition-colors">Каталог пород</a>
+                <a href="#quiz-section" onclick="openQuizModal()" class="hover:text-rose-400 transition-colors cursor-pointer">Тест подбора</a>
+            </nav>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="openQuizModal()" class="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold px-5 py-2.5 rounded-2xl shadow-lg shadow-rose-500/25 transition-all transform hover:-translate-y-0.5 flex items-center space-x-2">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    <span>Пройти тест</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="relative overflow-hidden pt-16 pb-24 lg:pt-24 lg:pb-32">
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-rose-600/15 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+        <div class="absolute top-1/3 right-10 w-[350px] h-[350px] bg-cyan-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-12 space-y-6 text-center max-w-3xl mx-auto">
+                    <div class="inline-flex items-center space-x-2 bg-rose-500/10 border border-rose-500/30 px-4 py-1.5 rounded-full text-xs font-semibold text-rose-400 tracking-wide uppercase">
+                        <i data-lucide="heart" class="w-3.5 h-3.5 fill-current"></i>
+                        <span>Интерактивная энциклопедия кошачьих характеров</span>
+                    </div>
+                    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-tight">
+                        Найди своего <span class="text-rose-500 border-b-4 border-rose-500/50 pb-1" id="typewriterTarget"></span><span class="animate-pulse">|</span>
+                    </h1>
+                    <p class="text-lg text-slate-300 max-w-2xl mx-auto font-normal">
+                        Исследуйте породы кошек с уникальными интерактивными анимациями характера, тепловыми эффектами, звуками и тестом на совместимость под ваш ритм жизни.
+                    </p>
+                    <div class="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
+                        <a href="#explorer" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-xl transition-all flex items-center justify-center space-x-3 text-base">
+                            <span>Смотреть каталог</span>
+                            <i data-lucide="arrow-down" class="w-5 h-5 text-rose-400"></i>
+                        </a>
+                        <button onclick="openQuizModal()" class="w-full sm:w-auto bg-gradient-to-r from-rose-500 to-pink-600 text-white font-semibold px-8 py-4 rounded-2xl shadow-lg shadow-rose-500/25 hover:opacity-90 transition-all flex items-center justify-center space-x-2 text-base">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            <span>Подобрать породу</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="explorer" class="py-16 bg-slate-950/50 border-t border-slate-800/80 flex-1">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12 space-y-4">
+                <span class="text-rose-400 font-semibold text-sm uppercase tracking-wider">Каталог пород</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Выберите пушистого друга</h2>
+                <p class="text-slate-400">Нажмите на любую карточку, чтобы открыть подробную информацию и активировать уникальный интерактивный эффект породы!</p>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
+                <div class="relative w-full md:w-96">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </span>
+                    <input type="text" id="searchInput" oninput="filterBreeds()" placeholder="Поиск по названию, стране или чертам..." 
+                        class="w-full pl-12 pr-4 py-3.5 bg-cardBg border border-slate-700 rounded-2xl focus:outline-none focus:border-rose-500 text-white placeholder-slate-500 shadow-inner transition-all">
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center gap-2 w-full md:w-auto" id="filterPills">
+                    <button onclick="setFilter('All', this)" class="filter-btn px-5 py-2.5 rounded-2xl text-sm font-semibold transition-all bg-rose-500 text-white shadow-md shadow-rose-500/20">Все породы</button>
+                    <button onclick="setFilter('Активные', this)" class="filter-btn px-5 py-2.5 rounded-2xl text-sm font-semibold transition-all bg-cardBg border border-slate-700 text-slate-300 hover:border-rose-500">Активные</button>
+                    <button onclick="setFilter('Пушистые', this)" class="filter-btn px-5 py-2.5 rounded-2xl text-sm font-semibold transition-all bg-cardBg border border-slate-700 text-slate-300 hover:border-rose-500">Пушистые</button>
+                    <button onclick="setFilter('Спокойные', this)" class="filter-btn px-5 py-2.5 rounded-2xl text-sm font-semibold transition-all bg-cardBg border border-slate-700 text-slate-300 hover:border-rose-500">Спокойные</button>
+                    <button onclick="setFilter('Уникальные', this)" class="filter-btn px-5 py-2.5 rounded-2xl text-sm font-semibold transition-all bg-cardBg border border-slate-700 text-slate-300 hover:border-rose-500">Уникальные</button>
+                </div>
+            </div>
+
+            <!-- Breed Cards Grid -->
+            <div id="breedGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Dynamically injected via JS -->
+            </div>
+            
+            <div id="noResults" class="hidden text-center py-16 space-y-4">
+                <div class="text-5xl">😿</div>
+                <h3 class="text-2xl font-bold text-white">Котики не найдены</h3>
+                <p class="text-slate-400">Попробуйте изменить поисковый запрос или сбросить фильтры.</p>
+                <button onclick="resetFilters()" class="px-6 py-2.5 bg-rose-500 text-white font-semibold rounded-2xl shadow-lg">Сбросить фильтры</button>
+            </div>
+        </div>
+    </section>
+
+    <div id="breedModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <div id="modalContent" class="glass-modal w-full max-w-3xl rounded-[32px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300 max-h-[90vh] flex flex-col border border-slate-700 relative">
+            <!-- Decorative dark side paws -->
+            <div class="absolute left-3 top-1/3 text-slate-800 text-3xl animate-pulse pointer-events-none select-none opacity-40">🐾</div>
+            <div class="absolute left-2 top-2/3 text-slate-800 text-2xl animate-bounce pointer-events-none select-none opacity-30">🐾</div>
+            <div class="absolute right-3 top-1/4 text-slate-800 text-3xl animate-bounce pointer-events-none select-none opacity-40">🐾</div>
+            <div class="absolute right-2 top-3/5 text-slate-800 text-2xl animate-pulse pointer-events-none select-none opacity-30">🐾</div>
+
+            <div id="modalHeader" class="relative p-6 sm:p-8 bg-gradient-to-r from-slate-900 to-slate-800 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center space-x-4">
+                    <div id="modalAvatar" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-cardBg shadow-lg overflow-hidden border-2 border-slate-600 flex-shrink-0">
+                        <!-- Image -->
+                    </div>
+                    <div>
+                        <span id="modalCategory" class="px-3 py-1 bg-rose-500/20 text-rose-400 text-xs font-bold rounded-full uppercase tracking-wider border border-rose-500/30"></span>
+                        <h2 id="modalTitle" class="text-2xl sm:text-3xl font-extrabold text-white mt-1"></h2>
+                        <p id="modalOrigin" class="text-sm text-slate-400 flex items-center space-x-1 mt-0.5">
+                            <i data-lucide="map-pin" class="w-4 h-4 mr-1 text-rose-500"></i> <span id="modalOriginText"></span>
+                        </p>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="w-10 h-10 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full flex items-center justify-center shadow-md transition-all">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-6 sm:p-8 space-y-6 overflow-y-auto flex-1">
+                <div id="personalityStage" class="bg-cardBg p-6 rounded-2xl border border-slate-700 shadow-inner relative overflow-hidden flex flex-col items-center justify-center min-h-[140px] transition-all">
+                    <div id="personalityAnimationArea" class="text-center space-y-2 w-full"></div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-lg text-white mb-2">О породе</h4>
+                    <p id="modalDescription" class="text-slate-300 leading-relaxed text-sm sm:text-base"></p>
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="font-bold text-lg text-white">Характеристики</h4>
+                    <div id="modalScores" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                </div>
+
+                <div class="bg-slate-900/60 border border-slate-800 p-4 sm:p-5 rounded-2xl flex items-start space-x-4">
+                    <div class="text-3xl">💡</div>
+                    <div>
+                        <h5 class="font-bold text-white">Интересный факт</h5>
+                        <p id="modalFunFact" class="text-sm text-slate-300 mt-1"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 sm:p-6 bg-slate-900 border-t border-slate-800 flex items-center justify-between">
+                <span id="modalLifespan" class="text-xs font-semibold text-slate-400"></span>
+                <button onclick="closeModal()" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl transition-all">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="quizModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-modal w-full max-w-lg rounded-[32px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300 flex flex-col border border-slate-700">
+            <div class="p-6 bg-gradient-to-r from-slate-900 to-slate-800 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500 text-white flex items-center justify-center">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">Тест: Найди свою породу</h3>
+                </div>
+                <button onclick="closeQuizModal()" class="w-9 h-9 bg-slate-800 rounded-full flex items-center justify-center hover:bg-slate-700 text-slate-300">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 sm:p-8" id="quizContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        const catBreeds = [
+            {
+                id: 'sphynx',
+                name: 'Канадский сфинкс',
+                category: 'Уникальные',
+                origin: 'Канада',
+                description: 'Лысые, невероятно ласковые и теплые наощупь кошки. Обожают сидеть на ручках и обладают бархатистой кожей с повышенной температурой тела.',
+                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUtoD-99ezDpjwF0dqUBGRKF4uIMUhuGyF_rvSCF4_3AwYqMPT1IkTnnI&s=10',
+                lifespan: '12 - 15 лет',
+                funFact: 'Температура тела сфинксов достигает 39°C, поэтому они кажутся очень горячими живыми грелками.',
+                scores: { 'Активность': 80, 'Игривость': 90, 'Привязанность': 100, 'Уход': 70 },
+                personalityEffect: 'thermal'
+            },
+            {
+                id: 'scottish',
+                name: 'Шотландская вислоухая',
+                category: 'Спокойные',
+                origin: 'Шотландия',
+                description: 'Знамениты своими забавными загнутыми вперед ушками и привычкой сидеть в позе «будды» или на спине.',
+                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0iawXCzee0H99ErLBcZ8vU8vOpgN1yTdzBBmeuyRpme0iTbycFDG5fFj_&s=10',
+                lifespan: '11 - 14 лет',
+                funFact: 'Все шотландские вислоухие котята рождаются с прямыми ушами, которые начинают сгибаться только на 3-4 неделе жизни.',
+                scores: { 'Активность': 50, 'Игривость': 60, 'Привязанность': 90, 'Уход': 60 },
+                personalityEffect: 'ears'
+            },
+            {
+                id: 'mainecoon',
+                name: 'Мэйн-кун',
+                category: 'Пушистые',
+                origin: 'США',
+                description: 'Величественные гиганты с кисточками на ушах, мощным телом и удивительно мягким, добродушным характером.',
+                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDLjsRdXlhOq5RJGxT66unN-wJPPaMPYkpKxuzQm5Nw2AovkkayexaHCI&s=10',
+                lifespan: '12 - 15 лет',
+                funFact: 'Мэйн-куны практически не мяукают классическим образом, а издают уникальные мелодичные звуки, похожие на щебетание или мурлыканье.',
+                scores: { 'Активность': 75, 'Игривость': 80, 'Привязанность': 85, 'Уход': 85 },
+                personalityEffect: 'chirp'
+            },
+            {
+                id: 'ragdoll',
+                name: 'Регдолл',
+                category: 'Спокойные',
+                origin: 'США',
+                description: 'Название породы переводится как «тряпичная кукла». Эти кошки полностью расслабляются на руках у человека.',
+                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLCuR9-iJ8-mbTYPIdxI8FSo7vOlzUbL7zFAhSDhuK0B0nWklOx8sZ2m0z&s=10',
+                lifespan: '12 - 17 лет',
+                funFact: 'Регдоллы обладают удивительным свойством снижать мышечный тонус, когда их берут на ручки.',
+                scores: { 'Активность': 40, 'Игривость': 50, 'Привязанность': 100, 'Уход': 70 },
+                personalityEffect: 'melt'
+            },
+            {
+                id: 'siamese',
+                name: 'Сиамская кошка',
+                category: 'Активные',
+                origin: 'Таиланд',
+                description: 'Грациозные голубоглазые аристократы с контрастным окрасом (колор-пойнт). Очень общительны и «разговорчивы».',
+                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmTT_jWevUm4Ha4IUatTTLryqU8ME_AWqJNmwWQ6IgS25GgLN9WGzTVuY&s=10',
+                lifespan: '15 - 20 лет',
+                funFact: 'Сиамские кошки могут издавать более 100 различных звуковых оттенков для общения с хозяином.',
+                scores: { 'Активность': 95, 'Игривость': 95, 'Привязанность': 95, 'Уход': 40 },
+                personalityEffect: 'speech'
+            },
+            {
+                id: 'bengal',
+                name: 'Бенгальская кошка',
+                category: 'Активные',
+                origin: 'США',
+                description: 'Дикая леопардовая красота в домашнем питомце. Невероятно прыгучие, умные и любящие воду кошки.',
+                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTnSMsrAKMtHupJEeT9YmeQWTcTFkT4uqs1K5keMur6w&s=10',
+                lifespan: '12 - 16 лет',
+                funFact: 'Шерсть бенгальских кошек может потрясающе мерцать на солнце благодаря особому золотистому гену.',
+                scores: { 'Активность': 100, 'Игривость': 100, 'Привязанность': 70, 'Уход': 50 },
+                personalityEffect: 'spark'
+            },
+            {
+                id: 'british',
+                name: 'Британская короткошерстная',
+                category: 'Спокойные',
+                origin: 'Великобритания',
+                description: 'Плюшевая шерсть, круглые щечки и независимый, уравновешенный характер истинного джентльмена.',
+                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMBBf8mUatgmRPPHoYW2Owm40Rwe0fIHv3SeGCdwjUyVuQYYzEpQPHPMG-&s=10',
+                lifespan: '12 - 17 лет',
+                funFact: 'Именно британская кошка стала прообразом Чеширского кота из сказки Льюиса Кэрролла.',
+                scores: { 'Активность': 45, 'Игривость': 55, 'Привязанность': 75, 'Уход': 50 },
+                personalityEffect: 'plush'
+            },
+            {
+                id: 'munchkin',
+                name: 'Манчкин',
+                category: 'Уникальные',
+                origin: 'США',
+                description: 'Кошки-таксы с короткими лапками, которые обожают вставать на задние лапки, чтобы лучше разглядеть мир.',
+                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-2eG-K8n9xhwSnj_vGZoCkXMzVPTgp9VGiMRm5kAzDzTWaLeePDqT1t4&s=10',
+                lifespan: '12 - 15 лет',
+                funFact: 'Несмотря на короткие лапы, манчкины бегают и запрыгивают на диваны ничуть не хуже других кошек.',
+                scores: { 'Активность': 80, 'Игривость': 90, 'Привязанность': 90, 'Уход': 60 },
+                personalityEffect: 'hop'
+            }
+        ];
+
+        let currentFilter = 'All';
+        let currentSearch = '';
+        let activeBreedId = null;
+
+        function renderBreeds() {
+            const grid = document.getElementById('breedGrid');
+            const noResults = document.getElementById('noResults');
+            grid.innerHTML = '';
+
+            const filtered = catBreeds.filter(breed => {
+                const matchesCategory = currentFilter === 'All' || breed.category === currentFilter;
+                const matchesSearch = breed.name.toLowerCase().includes(currentSearch.toLowerCase()) ||
+                                      breed.origin.toLowerCase().includes(currentSearch.toLowerCase()) ||
+                                      breed.description.toLowerCase().includes(currentSearch.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            filtered.forEach(breed => {
+                const card = document.createElement('div');
+                card.className = 'bg-cardBg border border-slate-800 rounded-[28px] overflow-hidden shadow-xl hover:border-rose-500/50 hover:shadow-rose-500/10 transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col group cursor-pointer';
+                card.onclick = () => openBreedModal(breed.id);
+
+                card.innerHTML = `
+                    <div class="relative h-60 w-full overflow-hidden bg-slate-900 flex items-center justify-center">
+                        <img src="${breed.image}" alt="${breed.name}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/1e293b/ffffff?text=Cat'">
+                        <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-rose-400 border border-slate-700/50">
+                            ${breed.category}
+                        </div>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xl font-bold text-white group-hover:text-rose-400 transition-colors">${breed.name}</h3>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-1 flex items-center">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1 text-rose-500"></i> ${breed.origin}
+                            </p>
+                            <p class="text-slate-300 text-sm mt-3 line-clamp-2">${breed.description}</p>
+                        </div>
+                        <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-rose-400">
+                            <span>Узнать характер</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function setFilter(category, btn) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.className = 'filter-btn px-5 py-2.5 rounded-2xl text-sm font-semibold transition-all bg-cardBg border border-slate-700 text-slate-300 hover:border-rose-500';
+            });
+            btn.className = 'filter-btn px-5 py-2.5 rounded-2xl text-sm font-semibold transition-all bg-rose-500 text-white shadow-md shadow-rose-500/20';
+            renderBreeds();
+        }
+
+        function filterBreeds() {
+            currentSearch = document.getElementById('searchInput').value;
+            renderBreeds();
+        }
+
+        function resetFilters() {
+            currentFilter = 'All';
+            currentSearch = '';
+            document.getElementById('searchInput').value = '';
+            const allBtn = document.querySelector('.filter-btn');
+            setFilter('All', allBtn);
+        }
+
+        function openBreedModal(id) {
+            activeBreedId = id;
+            const breed = catBreeds.find(b => b.id === id);
+            if (!breed) return;
+
+            document.getElementById('modalCategory').innerText = breed.category;
+            document.getElementById('modalTitle').innerText = breed.name;
+            document.getElementById('modalOriginText').innerText = breed.origin;
+            document.getElementById('modalDescription').innerText = breed.description;
+            document.getElementById('modalFunFact').innerText = breed.funFact;
+            document.getElementById('modalLifespan').innerText = `Продолжительность жизни: ${breed.lifespan}`;
+
+            const avatar = document.getElementById('modalAvatar');
+            avatar.innerHTML = `<img src="${breed.image}" class="w-full h-full object-cover object-center" onerror="this.src='https://placehold.co/200x200/1e293b/ffffff?text=Cat'">`;
+
+            const scoresContainer = document.getElementById('modalScores');
+            scoresContainer.innerHTML = '';
+            for (let [key, val] of Object.entries(breed.scores)) {
+                scoresContainer.innerHTML += `
+                    <div class="space-y-1 bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+                        <div class="flex justify-between text-xs font-semibold text-slate-300">
+                            <span>${key}</span>
+                            <span class="text-rose-400">${val}%</span>
+                        </div>
+                        <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-rose-500 to-amber-500 rounded-full transition-all duration-1000" style="width: ${val}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            triggerBreedPersonality();
+
+            const modal = document.getElementById('breedModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('modalContent').classList.remove('scale-95');
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('breedModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('modalContent').classList.add('scale-95');
+            document.body.style.overflow = '';
+        }
+
+        function triggerBreedPersonality() {
+            const breed = catBreeds.find(b => b.id === activeBreedId);
+            if (!breed) return;
+
+            const area = document.getElementById('personalityAnimationArea');
+            const stage = document.getElementById('personalityStage');
+            
+            stage.className = "bg-cardBg p-6 rounded-2xl border border-slate-700 shadow-inner relative overflow-hidden flex flex-col items-center justify-center min-h-[140px] transition-all";
+
+            if (breed.personalityEffect === 'thermal') {
+                stage.classList.add('border-rose-500/60', 'shadow-rose-500/20');
+                area.innerHTML = `
+                    <div class="absolute inset-0 bg-gradient-to-t from-rose-600/20 via-amber-500/10 to-transparent animate-pulse-glow pointer-events-none"></div>
+                    <div class="relative z-10 space-y-2">
+                        <div class="inline-flex items-center space-x-2 px-3 py-1 bg-rose-500/20 border border-rose-500/40 rounded-full text-rose-300 text-xs font-bold">
+                            <span>🌡️ Режим тепловизора активен: 39°C</span>
+                        </div>
+                        <p class="text-sm text-slate-300">Котик излучает мягкое бархатное тепло и греет ладошки!</p>
+                    </div>
+                `;
+            } else if (breed.personalityEffect === 'ears') {
+                stage.classList.add('border-amber-500/60');
+                area.innerHTML = `
+                    <div class="relative z-10 space-y-2">
+                        <div class="text-4xl animate-bounce">🐱💬</div>
+                        <p class="text-sm font-bold text-white">Ушки забавно сложились вперед!</p>
+                        <p class="text-xs text-slate-400">Слушает каждый шорох с максимальным любопытством.</p>
+                    </div>
+                `;
+            } else if (breed.personalityEffect === 'chirp') {
+                stage.classList.add('border-cyan-500/60');
+                area.innerHTML = `
+                    <div class="relative z-10 space-y-2">
+                        <div class="text-4xl animate-pulse">🐾🦁</div>
+                        <p class="text-sm font-bold text-white">Глубокое величественное мурлыканье</p>
+                        <p class="text-xs text-slate-400">Мэйн-кун издает мягкие трели и щебетание вместо обычного мяуканья.</p>
+                    </div>
+                `;
+            } else if (breed.personalityEffect === 'melt') {
+                stage.classList.add('border-purple-500/60');
+                area.innerHTML = `
+                    <div class="relative z-10 space-y-2">
+                        <div class="text-4xl transform rotate-12 transition-transform">🐾💤</div>
+                        <p class="text-sm font-bold text-white">Полный дзен и расслабление</p>
+                        <p class="text-xs text-slate-400">Котик превратился в «тряпичную куклу» и полностью расслабил лапки.</p>
+                    </div>
+                `;
+            } else if (breed.personalityEffect === 'speech') {
+                stage.classList.add('border-sky-500/60');
+                area.innerHTML = `
+                    <div class="relative z-10 space-y-2 bg-sky-950/40 border border-sky-500/30 px-4 py-3 rounded-2xl">
+                        <p class="text-sm font-bold text-sky-300">«Мрууу! Обрати на меня внимание!»</p>
+                        <p class="text-xs text-slate-400">Сиамский соловей ведет с вами оживленный диалог.</p>
+                    </div>
+                `;
+            } else if (breed.personalityEffect === 'spark') {
+                stage.classList.add('border-yellow-500/60');
+                area.innerHTML = `
+                    <div class="relative z-10 space-y-2">
+                        <div class="text-4xl animate-spin" style="animation-duration: 6s;">🐆✨</div>
+                        <p class="text-sm font-bold text-white">Вспышка дикой энергии</p>
+                        <p class="text-xs text-slate-400">Бенгальский леопард готов совершить акробатический прыжок!</p>
+                    </div>
+                `;
+            } else if (breed.personalityEffect === 'plush') {
+                stage.classList.add('border-indigo-500/60');
+                area.innerHTML = `
+                    <div class="relative z-10 space-y-2">
+                        <div class="text-4xl">🧸👑</div>
+                        <p class="text-sm font-bold text-white">Плюшевое спокойствие джентльмена</p>
+                        <p class="text-xs text-slate-400">Невозмутимая гордая осанка истинного аристократа.</p>
+                    </div>
+                `;
+            } else if (breed.personalityEffect === 'hop') {
+                stage.classList.add('border-emerald-500/60');
+                area.innerHTML = `
+                    <div class="relative z-10 space-y-2">
+                        <div class="text-4xl animate-bounce">🐾🦘</div>
+                        <p class="text-sm font-bold text-white">Прыжок любопытного манчкина</p>
+                        <p class="text-xs text-slate-400">Встает на задние лапки, чтобы видеть всё вокруг!</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Quiz Logic
+        const quizSteps = [
+            {
+                question: 'Какой ритм жизни вам ближе?',
+                options: [
+                    { text: 'Активный и энергичный (люблю спорт и игры)', category: 'Активные' },
+                    { text: 'Спокойный и уютный вечер дома с книгой', category: 'Спокойные' },
+                    { text: 'Обожаю пушистых гигантов и внимание', category: 'Пушистые' },
+                    { text: 'Хочу уникальную и редкую породу', category: 'Уникальные' }
+                ]
+            }
+        ];
+
+        // Typewriter effect setup
+        const words = ['идеального котика', 'пушистого друга', 'ласкового соседа', 'верного компаньона'];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+
+        function typeWriter() {
+            const currentWord = words[wordIndex];
+            const target = document.getElementById('typewriterTarget');
+            if (!target) return;
+
+            if (isDeleting) {
+                target.innerText = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                target.innerText = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 50 : 100;
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                typeSpeed = 2000; // Pause at end of word
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                typeSpeed = 500;
+            }
+
+            setTimeout(typeWriter, typeSpeed);
+        }
+
+        function openQuizModal() {
+            const modal = document.getElementById('quizModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            renderQuizStep(0);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeQuizModal() {
+            const modal = document.getElementById('quizModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            document.body.style.overflow = '';
+        }
+
+        function renderQuizStep(stepIndex) {
+            const container = document.getElementById('quizContainer');
+            const step = quizSteps[stepIndex];
+
+            let html = `
+                <div class="space-y-6">
+                    <h4 class="text-lg font-bold text-white">${step.question}</h4>
+                    <div class="space-y-3">
+            `;
+
+            step.options.forEach((opt, idx) => {
+                html += `
+                    <button onclick="selectQuizAnswer('${opt.category}')" class="w-full text-left p-4 rounded-2xl bg-cardBg border border-slate-700 hover:border-rose-500 text-slate-200 font-medium transition-all flex items-center justify-between group">
+                        <span>${opt.text}</span>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500 group-hover:text-rose-400 transition-colors"></i>
+                    </button>
+                `;
+            });
+
+            html += `</div></div>`;
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function selectQuizAnswer(category) {
+            closeQuizModal();
+            setFilter(category, document.querySelector('.filter-btn'));
+            const explorer = document.getElementById('explorer');
+            explorer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.onload = function() {
+            renderBreeds();
+            lucide.createIcons();
+            setTimeout(typeWriter, 1000);
+        }
+    </script>
+</body>
+</html>
